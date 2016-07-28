@@ -41,6 +41,10 @@ def output_apps(apps)
       stars = a['stars']
       lang = a['lang']
 
+      date_added = a['date_added']
+      screenshots = a['screenshots']
+      suggested_by = a['suggested_by']
+
       o << "- #{name}"
 
       if desc.nil?
@@ -63,8 +67,40 @@ def output_apps(apps)
 
       o << "\n"
       o << "  - #{link}\n"
-      o << "  - #{homepage}\n" unless homepage.nil?
       o << "  - #{itunes}\n" unless itunes.nil?
+
+      unless homepage.nil? && screenshots.nil?
+        details = "  <details><summary>more</summary>\n"
+        details << "  #{homepage} - " unless homepage.nil?
+
+        formatted_date =
+        if (date_added)
+          date = DateTime.parse(date_added)
+          date.strftime "on %B %e, %Y"
+        else
+          ''
+        end
+
+        if suggested_by
+          author =
+            if suggested_by.include? '@'
+              "[#{suggested_by}](https://github.com/#{suggested_by.sub('@','')})"
+            else
+              suggested_by
+            end
+
+          details << "  Added by #{author} #{formatted_date} \n"
+        end
+
+        unless screenshots.nil?
+          screenshots.each_with_index do |s, i|
+            details << "  ![#{name} image #{i+1}](#{screenshots[i]}) \n" unless screenshots.nil?
+          end
+        end
+
+        details << "  </details>\n"
+        o << details
+      end
   end
   o
 end
